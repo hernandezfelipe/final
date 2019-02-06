@@ -70,8 +70,8 @@ while True:
 
     score = loaded_model.predict(X_train)
     
-    #cv2.imshow("Cam", img)
-    #cv2.waitKey(1)
+    cv2.imshow("Cam", img)
+    cv2.waitKey(1)
 
     print(score)
     print("Wait: ", wait, "Seq: ", sequence, "Score: ", score)
