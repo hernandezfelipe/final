@@ -54,9 +54,11 @@ BRIGHTNESS_THRESHOLD2 = 200
 BLACK_PIXELS_PERCENTAGE = 0.50
 WHITE_PIXELS_PERCENTAGE = 0.50
 
-SCORE_THRESHOLD = 0.5 # > 
+SCORE_THRESHOLD = 0.8 # > 
 time_init = time()
 time_end = 0
+
+pic_enabled = True
 
 while True:
 
@@ -69,7 +71,7 @@ while True:
         
             os.system("reboot")
         
-        elif command == "shutdown" or command == "SHUTDOWN":
+        elif command == "shutdown" or command == "Shutdown":
         
             os.system("shutdown now")
         
@@ -126,7 +128,10 @@ while True:
             try:
             
                 print("Postando foto")
-                #post_picture(path+"/auto_tweet.png")
+                
+                if pic_enabled:
+                
+                    post_picture(path+"/auto_tweet.png")
             
             except:
             
