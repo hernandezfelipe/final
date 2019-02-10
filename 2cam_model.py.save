@@ -103,12 +103,15 @@ while True:
 
     score = loaded_model.predict(X_train)[0][0]
     
-    #cv2.imshow("Cam", img)
-    #cv2.waitKey(1)
+    cv2.imshow("Cam", cv2.resize(img, (320, 240)))
+    cv2.waitKey(1)
     
     sound = bark()
+    
+    time_id = '{:02d}'.format(now.day)+"-"+str(now.month)+"-"+str(now.year)+"-"+str(now.hour)+":"+str(now.minute)+":"+str(now.second)
 
-    print("Wait: ", wait, "Seq: ", sequence, "Score: ", score, "Sound: ", sound)
+    print("Wait:", wait, "Seq:", sequence, "Score:", score, "Sound:", sound, "Time:", time_id)
+ 
               
     if now.hour < 20 and now.hour > 6:
       
@@ -118,8 +121,6 @@ while True:
                 
         elif score > SCORE_THRESHOLD and wait == 0 and sequence == THRESHOLD and sound > 0.9:
             
-            pic_id = str(now.month) + str(now.day) + str(now.hour) + str(now.minute) + str(now.second)
-
             cv2.imwrite(path+"/auto_tweet.png",img)
 
             wait = WAIT_TURNS
@@ -148,6 +149,6 @@ while True:
     
     time_end = time()  
     print(time() - time_taken, "Sec de processamento")  
-    f = open("report.txt", 'w')
-    f.write(str(now.year)+"-"+str(now.month)+"-"+str(now.day)+"-"+str(now.hour)+":"+str(now.minute)+":"+str(now.second))
+    f = open("report.txt", 'a')
+    f.write(str(time_id) + "," + str(score) + "," + str(sound) + "\n")
     f.close()

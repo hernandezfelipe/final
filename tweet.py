@@ -18,7 +18,7 @@ def post_picture(image_path):
 	api = tweepy.API(auth)
 	now = datetime.now() 
 
-	tweet = "Olar ("+str(now.hour)+":"+str(now.minute)+":"+str(now.second)+")" # toDo 
+	tweet = "Olar ("+'{:02d}'.format(now.hour)+":"+'{:02d}'.format(now.minute)+":"+'{:02d}'.format(now.second)+")" # toDo 
 	#image_path ="path of the image" # toDo 
 
 	# update the status 

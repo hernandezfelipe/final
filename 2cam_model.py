@@ -18,36 +18,22 @@ from time import sleep, time
 from datetime import datetime
 from audio import bark
 from url import get_url
-
+from model import predict
+ 
 p = psutil.Process(os.getpid())
 p.nice(19)  # set>>> p.nice()10
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-path = '/home/felipe/final'
-
-json_file = open(path+'/model_mic.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-loaded_model = model_from_json(loaded_model_json)
-# load weights into new model
-loaded_model.load_weights(path+'/model_mic.h5')
-print("Loaded model from disk")
- 
-# evaluate loaded model on test data
-loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
-
    
 cam = cv2.VideoCapture(0)    
-
-div = 4
-HEIGHT = 480 // div
-WIDTH = 640  // div
+sleep(1)
+s, img = cam.read()
+sleep(1)
 
 wait = 0
-WAIT_TURNS = 60
+WAIT_TURNS = 0
 sequence = 0
-THRESHOLD = 1
+THRESHOLD = 0
 
 BRIGHTNESS_THRESHOLD = 50
 BRIGHTNESS_THRESHOLD2 = 200
@@ -59,6 +45,8 @@ time_init = time()
 time_end = 0
 
 pic_enabled = True
+
+old_sound = 0
 
 while True:
 
@@ -91,35 +79,39 @@ while True:
 
     now = datetime.now()         
     time_taken = time()   
+        
     s, img = cam.read()   
     
-    res = img.copy()
-    res = cv2.resize(res, (HEIGHT,WIDTH))
-        
-    X_train = np.array(res)       
-    X_train = X_train.reshape(1, HEIGHT, WIDTH, 3)
-    X_train = X_train.astype('float32')
-    X_train/=255
-
-    score = loaded_model.predict(X_train)[0][0]
+    score = predict(img)    
     
-    cv2.imshow("Cam", img)
+    cv2.imshow("Cam", cv2.resize(img, (320, 240)))
     cv2.waitKey(1)
+  
+    current_sound = bark()
     
-    sound = bark()
+    dif = current_sound - old_sound
+    
+    if dif >= 0:
+    
+        sound = dif
+        
+    else:
+    
+        sound = 0  
+        
+    time_id = '{:02d}'.format(now.day)+"-"+'{:02d}'.format(now.month)+"-"+str(now.year)+"-"+'{:02d}'.format(now.hour)+":"+'{:02d}'.format(now.minute)+":"+'{:02d}'.format(now.second)
 
-    print("Wait: ", wait, "Seq: ", sequence, "Score: ", score, "Sound: ", sound)
+    print("W:", wait, "S:", sequence, "Score:", '{:04f}'.format(score), "Sound:", '{:04f}'.format(sound), "Time:", time_id)
+ 
               
     if now.hour < 20 and now.hour > 6:
       
-        if score > SCORE_THRESHOLD and wait == 0 and sequence < THRESHOLD:
+        if score > SCORE_THRESHOLD and wait == 0 and sequence < THRESHOLD and sound > 0.9:
         
             sequence += 1
                 
         elif score > SCORE_THRESHOLD and wait == 0 and sequence == THRESHOLD and sound > 0.9:
             
-            pic_id = str(now.month) + str(now.day) + str(now.hour) + str(now.minute) + str(now.second)
-
             cv2.imwrite(path+"/auto_tweet.png",img)
 
             wait = WAIT_TURNS
@@ -148,6 +140,8 @@ while True:
     
     time_end = time()  
     print(time() - time_taken, "Sec de processamento")  
-    f = open("report.txt", 'w')
-    f.write(str(now.year)+"-"+str(now.month)+"-"+str(now.day)+"-"+str(now.hour)+":"+str(now.minute)+":"+str(now.second))
+    f = open("report.txt", 'a')
+    f.write(str(time_id) + " " + '{:04f}'.format(score) + " " + '{:04f}'.format(sound) + "\n")
     f.close()
+
+    old_sound = sound

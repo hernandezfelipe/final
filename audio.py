@@ -1,4 +1,13 @@
 import sounddevice as sd
+from datetime import datetime
+
+
+def get_time():
+
+    now = datetime.now()
+    time_id = '{:02d}'.format(now.day)+"-"+'{:02d}'.format(now.month)+"-"+str(now.year)+"-"+'{:02d}'.format(now.hour)+":"+'{:02d}'.format(now.minute)+":"+'{:02d}'.format(now.second)
+    
+    return time_id
 
 
 def get_id():
@@ -22,16 +31,14 @@ def bark():
     device = sd.query_devices()[get_id()]
     fs = int(device["default_samplerate"])
     duration = 1
-    rec = sd.rec((int(duration) * fs), samplerate = fs, channels=1)
+    rec = sd.rec((int(duration) * fs), samplerate = fs, channels=2)
     sd.wait()
-            
+    
     return rec.max()
-        
-        
+    
 if __name__ == "__main__":
 
     pass
-        
     
        
 
