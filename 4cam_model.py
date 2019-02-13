@@ -57,12 +57,12 @@ while True:
             
     now = datetime.now()         
     time_taken = time() 
-    
-
-    
+       
     s, img = cam.read()
-    
-    cv2.imshow("Cam", img)
+            
+    pic_img = img.copy()
+        
+    cv2.imshow("Cam", pic_img)
     cv2.waitKey(1)       
     
     score = predict(img)   
@@ -73,7 +73,10 @@ while True:
     
     if score > SCORE_THRESHOLD:
     
+    
         sound = bark()        
+        
+        pic_ok = "O"
     
         print("W:", wait, "S:", sequence, "Score:", '{:04f}'.format(score), "Sound:", '{:04f}'.format(sound), "Time:", time_id)
      
@@ -86,12 +89,8 @@ while True:
                     
             elif sound > SOUND_THRESHOLD and wait == 0 and sequence == THRESHOLD:
                 
-                f = open("report.txt", 'a')
-    
-                f.write(str(time_id) + " " + '{:04f}'.format(score) + " " + '{:04f}'.format(sound) + "\n")
-    
-                f.close()
-                cv2.imwrite(path+"/auto_tweet.png",img)
+                pic_ok = "X"
+                cv2.imwrite(path+"/auto_tweet.png", pic_img)
 
                 wait = WAIT_TURNS
                 sequence = 0
@@ -114,7 +113,13 @@ while True:
             
                 if wait > 0:
                 
-                    wait -= 1               
+                    wait -= 1  
+                    
+        f = open("report.txt", 'a')
+
+        f.write(str(time_id) + " " + '{:04f}'.format(score) + " " + '{:04f}'.format(sound) + " " + pic_ok + "\n")
+    
+        f.close()
 
     command_delay = (command_delay + 1) % 20
     

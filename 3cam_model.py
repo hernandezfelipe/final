@@ -53,9 +53,13 @@ command_delay = 0
 
 command = "Init"
 
+pic_ok = "O"
+
 while True:
 
     score = 0
+    
+    pic_ok = "O"
             
     now = datetime.now()         
     time_taken = time() 
@@ -77,7 +81,7 @@ while True:
     
     s, img = cam.read()
     
-    cv2.imshow("Cam", cv2.resize(img, (320, 240)))
+    cv2.imshow("Cam", img)
     cv2.waitKey(1)             
     
     time_id = '{:02d}'.format(now.day)+"-"+'{:02d}'.format(now.month)+"-"+str(now.year)+"-"+'{:02d}'.format(now.hour)+":"+'{:02d}'.format(now.minute)+":"+'{:02d}'.format(now.second)
@@ -87,7 +91,7 @@ while True:
         score = predict(img)    
     
         print("W:", wait, "S:", sequence, "Score:", '{:04f}'.format(score), "Sound:", '{:04f}'.format(sound), "Time:", time_id)
-     
+             
                   
         if now.hour < 20 and now.hour > 6:
           
@@ -97,12 +101,9 @@ while True:
                     
             elif score > SCORE_THRESHOLD and wait == 0 and sequence == THRESHOLD:
                 
-                f = open("report.txt", 'a')
-    
-                f.write(str(time_id) + " " + '{:04f}'.format(score) + " " + '{:04f}'.format(sound) + "\n")
-    
-                f.close()
                 cv2.imwrite(path+"/auto_tweet.png",img)
+                
+                pic_ok = "X"
 
                 wait = WAIT_TURNS
                 sequence = 0
@@ -125,7 +126,17 @@ while True:
             
                 if wait > 0:
                 
-                    wait -= 1               
+                    wait -= 1    
+                    
+                    
+                                        
+        f = open("report.txt", 'a')
+
+        f.write(str(time_id) + " " + '{:04f}'.format(score) + " " + '{:04f}'.format(sound) + " " + pic_ok + "\n")
+
+        f.close()           
+
+
 
     command_delay = (command_delay + 1) % 10
     
@@ -145,7 +156,8 @@ while True:
             pass
      
     time_end = time()  
-        
+     
+       
     print('{:04f}'.format(time_end - time_taken), "Segundos ", "Comando:", command, "-", command_delay, "Time:", time_id) 
     
     f = open("last_run.txt","w")
