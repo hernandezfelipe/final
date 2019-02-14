@@ -22,7 +22,7 @@ from model import predict
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("a")
+parser.add_argument("a", nargs='?', default="empty")
 args = parser.parse_args()
 
  
