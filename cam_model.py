@@ -19,6 +19,12 @@ from datetime import datetime
 from audio import bark
 from url import get_url
 from model import predict
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("a")
+args = parser.parse_args()
+
  
 p = psutil.Process(os.getpid())
 p.nice(19)  # set>>> p.nice()10
@@ -31,17 +37,10 @@ cam = cv2.VideoCapture(0)
 path = '/home/felipe/final'
 
 wait = 0
-WAIT_TURNS = 60
-sequence = 0
-THRESHOLD = 0
+WAIT_TURNS = 240
 
-BRIGHTNESS_THRESHOLD = 50
-BRIGHTNESS_THRESHOLD2 = 200
-BLACK_PIXELS_PERCENTAGE = 0.50
-WHITE_PIXELS_PERCENTAGE = 0.50
-
-SCORE_THRESHOLD = 0.95 # > 
-SOUND_THRESHOLD = 0.95
+SCORE_THRESHOLD = 0.90 # > 
+SOUND_THRESHOLD = 0.90
 time_init = time()
 time_end = 0
 
@@ -54,6 +53,8 @@ command_delay = 0
 command = "Init"
 
 pic_ok = "O"
+
+loop = 20
 
 while True:
 
@@ -81,8 +82,14 @@ while True:
     
     s, img = cam.read()
     
-    cv2.imshow("Cam", img)
-    cv2.waitKey(1)             
+    if args.a == 'nocam':
+    
+        pass
+        
+    else:
+   
+        cv2.imshow("Cam", img)
+        cv2.waitKey(1)             
     
     time_id = '{:02d}'.format(now.day)+"-"+'{:02d}'.format(now.month)+"-"+str(now.year)+"-"+'{:02d}'.format(now.hour)+":"+'{:02d}'.format(now.minute)+":"+'{:02d}'.format(now.second)
     
@@ -90,23 +97,18 @@ while True:
       
         score = predict(img)    
     
-        print("W:", wait, "S:", sequence, "Score:", '{:04f}'.format(score), "Sound:", '{:04f}'.format(sound), "Time:", time_id)
+        print("W:", str(wait).zfill(2), "Score:", '{:04f}'.format(score), "Sound:", '{:04f}'.format(sound), "Time:", time_id)
              
                   
         if now.hour < 20 and now.hour > 6:
           
-            if score > SCORE_THRESHOLD and wait == 0 and sequence < THRESHOLD:
-            
-                sequence += 1
-                    
-            elif score > SCORE_THRESHOLD and wait == 0 and sequence == THRESHOLD:
+            if score > SCORE_THRESHOLD and wait == 0:
                 
                 cv2.imwrite(path+"/auto_tweet.png",img)
                 
                 pic_ok = "X"
 
                 wait = WAIT_TURNS
-                sequence = 0
                 
                 try:
                 
@@ -120,25 +122,21 @@ while True:
                 
                     print("Corrigir")
                            
-            else:
             
-                sequence = 0
-            
-                if wait > 0:
-                
-                    wait -= 1    
-                    
+        if wait > 0:
+        
+            wait -= 1                        
                     
                                         
         f = open("report.txt", 'a')
 
-        f.write(str(time_id) + " " + '{:04f}'.format(score) + " " + '{:04f}'.format(sound) + " " + pic_ok + "\n")
+        f.write("W: "+ str(wait).zfill(2) + " " + str(time_id) + " S: " + '{:04f}'.format(score) + " V: " + '{:04f}'.format(sound) + " " + pic_ok + "\n")
 
         f.close()           
 
 
 
-    command_delay = (command_delay + 1) % 10
+    command_delay = (command_delay + 1) % loop
     
     if command_delay == 0:
                 

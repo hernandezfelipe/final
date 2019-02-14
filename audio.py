@@ -26,19 +26,19 @@ def get_id():
     
     return -1
 
-def bark():
+def bark(duration = 0.2):
 
     device = sd.query_devices()[get_id()]
     fs = int(device["default_samplerate"])
-    duration = 1
-    rec = sd.rec((int(duration) * fs), samplerate = fs, channels=2)
+    rec = sd.rec(int((duration * fs)), samplerate = fs, channels=2)
     sd.wait()
     
     return rec.max()
     
 if __name__ == "__main__":
 
-    pass
+    v = bark()
+    print(v)
     
        
 
