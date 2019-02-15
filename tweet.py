@@ -5,10 +5,10 @@ from datetime import datetime
 def post_picture(image_path):
 
 	# personal details 
-	consumer_key ="ctzOeHT2AAgdy0lBJCvyFV6bl"
-	consumer_secret ="859k6wWLvkcgyFOVy7HPTpCtLClHimzHICnvTitFbhvi4WrrBs"
-	access_token ="878744744767172608-iO56XxpuXMK5OL6EtoXHrABgQ9LVB7d"
-	access_token_secret ="pkCCCTxvoMVpuyaZf6e9SQKO46d3L1ubWIYlgINen799f"
+	consumer_key =""
+	consumer_secret =""
+	access_token =""
+	access_token_secret =""
 
 	# authentication of consumer key and secret 
 	auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
